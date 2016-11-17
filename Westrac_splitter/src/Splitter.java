@@ -16,6 +16,7 @@ public class Splitter {
 	
 	private String fileName;
 	private static final char ENDCHAR = '(';
+	private static final String ENDFILENAME = ".sql";
 	private Vector<String> fileNames = new Vector<String>();
 	
 	Vector<File> files = new Vector<File>();
@@ -53,7 +54,6 @@ public class Splitter {
 				    	
 				    	if(fileNames.isEmpty()){
 				    		String newFileName = createFile(line);
-				    		System.out.println("Not in vector: " +newFileName);
 				    		fileNames.addElement(newFileName);
 				    	}
 				    	else{
@@ -62,7 +62,6 @@ public class Splitter {
 				    		boolean contains = false;
 
 				    		for (String name : fileNames) {
-					    		System.out.println("In vector: " +name);
 					    		if(line.contains(name)){
 					    			
 					    			contains = true;
@@ -91,27 +90,18 @@ public class Splitter {
 				}
 	}
 
-	private String createFile(String line) throws IOException {
+	
+private String createFile(String line) throws IOException {
 		
-		String newFileName = line.substring(0, line.indexOf(ENDCHAR));
+	String newFileName = resolveFileName(line);
+	System.out.println("Not in vector: " +newFileName);
+
+		
 		File file = new File(newFileName);
-		FileOutputStream fileOS = new FileOutputStream(file);
-		OutputStreamWriter fileOSW = new OutputStreamWriter(fileOS, "utf-8");
-		Writer fileWriter = new BufferedWriter(fileOSW);
+//		FileOutputStream fileOS = new FileOutputStream(file);
+//		OutputStreamWriter fileOSW = new OutputStreamWriter(fileOS, "utf-8");
+//		Writer fileWriter = new BufferedWriter(fileOSW);
 		
-		
-		fileWriter.write(line);
-		
-		fileWriter.flush();
-		
-		fileWriter.close();
-		return newFileName;
-	}
-	
-	
-	private void writeToFile(String line){
-		
-		String newFileName = line.substring(0, line.indexOf(ENDCHAR));
 		
 		try(FileWriter fw = new FileWriter(newFileName, true);
 			    BufferedWriter bw = new BufferedWriter(fw);
@@ -122,5 +112,32 @@ public class Splitter {
 			} catch (IOException e) {
 			    //exception handling left as an exercise for the reader
 			}
+
+		return newFileName;
+	}
+	
+	
+	private void writeToFile(String line){
+		
+		String newFileName = resolveFileName(line);
+		System.out.println("Already in vector: " +newFileName);
+
+		
+		try(FileWriter fw = new FileWriter(newFileName, true);
+			    BufferedWriter bw = new BufferedWriter(fw);
+			    PrintWriter out = new PrintWriter(bw))
+			{
+			    out.println(line);
+
+			} catch (IOException e) {
+			    //exception handling left as an exercise for the reader
+			}
+	}
+	
+	private String resolveFileName(String line){
+		String newFileName = line.substring(0, line.indexOf(ENDCHAR));
+//		newFileName += ENDFILENAME;
+		
+		return newFileName;
 	}
 }
