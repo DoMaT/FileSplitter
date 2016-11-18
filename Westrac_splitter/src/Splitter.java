@@ -13,131 +13,133 @@ import java.util.HashMap;
 import java.util.Vector;
 
 public class Splitter {
-	
+
 	private String fileName;
 	private static final char ENDCHAR = '(';
 	private static final String ENDFILENAME = ".sql";
 	private Vector<String> fileNames = new Vector<String>();
-	
+
 	Vector<File> files = new Vector<File>();
-	
+
 	HashMap<String, Writer> fileNameWriterMap = new HashMap<String, Writer>();
 
-
-	
 	public Splitter(String _file) {
 		fileName = _file;
 	}
-	
-	public void readAll() throws IOException{
+
+	public void readAll() throws IOException {
 		BufferedReader in = new BufferedReader(new FileReader(fileName));
-		
+
 		String line;
-		int i =0;
-		while((line = in.readLine()) != null && i < 10)
-		{
-		    System.out.println(line);
+		int i = 0;
+		while ((line = in.readLine()) != null && i < 10) {
+			System.out.println(line);
 			System.out.println(line.substring(0, line.indexOf(ENDCHAR)));
-		    i++;
+			i++;
 		}
 		in.close();
 
 	}
-	
-	public void split() throws FileNotFoundException, IOException{
-		
-		try (				
-				BufferedReader br = new BufferedReader(new FileReader(fileName))) {
-				    String line;
-				    while ((line = br.readLine()) != null) {
-				       // process the line
-				    	
-				    	if(fileNames.isEmpty()){
-				    		String newFileName = createFile(line);
-				    		fileNames.addElement(newFileName);
-				    	}
-				    	else{
-				    		Vector<String> newFileNames = new Vector<String>();
-				    		
-				    		boolean contains = false;
 
-				    		for (String name : fileNames) {
-					    		if(line.contains(name)){
-					    			
-					    			contains = true;
+	public void split() throws FileNotFoundException, IOException {
 
-					    		}
+		try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+			String line;
+
+			int counter = 0;
+			while ((line = br.readLine()) != null) {
+				// process the line
+				if (line.contains(Character.toString(ENDCHAR))) {
+					counter++;
+					if (fileNames.isEmpty()) {
+						String newFileName = createFile(line);
+						fileNames.addElement(newFileName);
+					} else {
+						Vector<String> newFileNames = new Vector<String>();
+
+						boolean contains = false;
+
+						for (String name : fileNames) {
+							if (line.contains(name)) {
+								//TODO if line contains name without ending
+								contains = true;
+
 							}
-				    		
-				    		if(contains){
-				    			//add new line to existing file
+						}
 
-				    			writeToFile(line);
+						if (contains) {
+							// add new line to existing file
 
-				    		}
-				    		else{
-				    			//create file with name from the beginning to first occurance of '('
-				    			
-				    			String newFileName = createFile(line);
-				    			newFileNames.addElement(newFileName);
+							writeToFile(line);
 
-				    		}
-				    		
-				    		fileNames.addAll(newFileNames);
-				    	}
-				    	
-				    }
+						} else {
+							// create file with name from the beginning to first
+							// occurance of '('
+
+							String newFileName = createFile(line);
+							newFileNames.addElement(newFileName);
+
+						}
+
+						fileNames.addAll(newFileNames);
+					}
+
 				}
+				else{
+					//line does not contain special character
+				}
+
+			}
+
+			System.out.println("Finito");
+			System.out.println("Splitted " + counter + " lines into following files: ");
+			for (String name : fileNames) {
+				System.out.println(name);
+			}
+		}
 	}
 
-	
-private String createFile(String line) throws IOException {
-		
-	String newFileName = resolveFileName(line);
-	System.out.println("Not in vector: " +newFileName);
+	private String createFile(String line) throws IOException {
 
-		
+		String newFileName = resolveFileName(line);
+		System.out.println("Not in vector: " + newFileName);
+
 		File file = new File(newFileName);
-//		FileOutputStream fileOS = new FileOutputStream(file);
-//		OutputStreamWriter fileOSW = new OutputStreamWriter(fileOS, "utf-8");
-//		Writer fileWriter = new BufferedWriter(fileOSW);
-		
-		
-		try(FileWriter fw = new FileWriter(newFileName, true);
-			    BufferedWriter bw = new BufferedWriter(fw);
-			    PrintWriter out = new PrintWriter(bw))
-			{
-			    out.println(line);
+		// FileOutputStream fileOS = new FileOutputStream(file);
+		// OutputStreamWriter fileOSW = new OutputStreamWriter(fileOS, "utf-8");
+		// Writer fileWriter = new BufferedWriter(fileOSW);
 
-			} catch (IOException e) {
-			    //exception handling left as an exercise for the reader
-			}
+		try (FileWriter fw = new FileWriter(newFileName, true);
+				BufferedWriter bw = new BufferedWriter(fw);
+				PrintWriter out = new PrintWriter(bw)) {
+			out.println(line);
+
+		} catch (IOException e) {
+			// exception handling left as an exercise for the reader
+		}
 
 		return newFileName;
 	}
-	
-	
-	private void writeToFile(String line){
-		
+
+	private void writeToFile(String line) {
+
 		String newFileName = resolveFileName(line);
-		System.out.println("Already in vector: " +newFileName);
+		System.out.println("Already in vector: " + newFileName);
 
-		
-		try(FileWriter fw = new FileWriter(newFileName, true);
-			    BufferedWriter bw = new BufferedWriter(fw);
-			    PrintWriter out = new PrintWriter(bw))
-			{
-			    out.println(line);
+		try (FileWriter fw = new FileWriter(newFileName, true);
+				BufferedWriter bw = new BufferedWriter(fw);
+				PrintWriter out = new PrintWriter(bw)) {
+			out.println(line);
 
-			} catch (IOException e) {
-			    //exception handling left as an exercise for the reader
-			}
+		} catch (IOException e) {
+			// exception handling left as an exercise for the reader
+		}
 	}
-	
-	private String resolveFileName(String line){
+
+	private String resolveFileName(String line) {
 		String newFileName = line.substring(0, line.indexOf(ENDCHAR));
-//		newFileName += ENDFILENAME;
-		
+		// newFileName += ENDFILENAME;
+
 		return newFileName;
 	}
 }

@@ -27,7 +27,7 @@ public class SplitFile {
 
 		} else {
 //			String s = "C:\\Users\\matdom\\git\\FileSplitter\\Westrac_splitter\\src\\toSplit.sql";
-			String s = "C:\\Users\\matdom\\OneDrive - Syncron\\L010\\L010_jailer_GIM.sql";
+			String s = "C:\\Users\\matdom\\Desktop\\test_split.sql";
 			s = s.replace("\\", "/");
 
 			splitter = new Splitter(s);
@@ -40,6 +40,4 @@ public class SplitFile {
 			}
 		}
 	}
-	
-	//TODO jak w linijce nie wystêpuje znak to pomiñ
 }
