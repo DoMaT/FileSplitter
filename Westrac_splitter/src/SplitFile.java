@@ -29,7 +29,7 @@ public class SplitFile {
 
 			splitter = new Splitter(_FILE);
 
-		} else if (argsCount > 1) {
+		} else if (argsCount == 4) {
 			_FILE = args[0];
 
 			System.out.println(_FILE);
@@ -44,15 +44,13 @@ public class SplitFile {
 
 			_ENDFILENAME = args[2];
 
-			if (args[3] == "-v")
-				_VERBOSE = true;
-			else if (args[3] == "-nv")
-				_VERBOSE = false;
-			else {
-				_VERBOSE = false;
+			if (args[3].length() != 1) {
 				error_in_params = true;
+				_VERBOSE = false;
 			}
-
+			else
+				_VERBOSE = true;
+			
 			if (error_in_params)
 				System.out.println("Error in parameters, some functions are default");
 
