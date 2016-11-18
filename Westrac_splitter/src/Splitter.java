@@ -2,11 +2,9 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.HashMap;
@@ -60,8 +58,10 @@ public class Splitter {
 						boolean contains = false;
 
 						for (String name : fileNames) {
-							if (line.contains(name)) {
-								//TODO if line contains name without ending
+
+							String shortName[] = name.split(ENDFILENAME);
+
+							if (line.contains(shortName[0])) {
 								contains = true;
 
 							}
@@ -84,9 +84,8 @@ public class Splitter {
 						fileNames.addAll(newFileNames);
 					}
 
-				}
-				else{
-					//line does not contain special character
+				} else {
+					// line does not contain special character - go ahead
 				}
 
 			}
@@ -102,12 +101,11 @@ public class Splitter {
 	private String createFile(String line) throws IOException {
 
 		String newFileName = resolveFileName(line);
-		System.out.println("Not in vector: " + newFileName);
 
+		System.out.println("Created file: " + newFileName);
+
+		@SuppressWarnings("unused")
 		File file = new File(newFileName);
-		// FileOutputStream fileOS = new FileOutputStream(file);
-		// OutputStreamWriter fileOSW = new OutputStreamWriter(fileOS, "utf-8");
-		// Writer fileWriter = new BufferedWriter(fileOSW);
 
 		try (FileWriter fw = new FileWriter(newFileName, true);
 				BufferedWriter bw = new BufferedWriter(fw);
@@ -115,7 +113,7 @@ public class Splitter {
 			out.println(line);
 
 		} catch (IOException e) {
-			// exception handling left as an exercise for the reader
+			// exception handling
 		}
 
 		return newFileName;
@@ -124,7 +122,8 @@ public class Splitter {
 	private void writeToFile(String line) {
 
 		String newFileName = resolveFileName(line);
-		System.out.println("Already in vector: " + newFileName);
+
+		System.out.println("Saved in file: " + newFileName);
 
 		try (FileWriter fw = new FileWriter(newFileName, true);
 				BufferedWriter bw = new BufferedWriter(fw);
@@ -132,13 +131,13 @@ public class Splitter {
 			out.println(line);
 
 		} catch (IOException e) {
-			// exception handling left as an exercise for the reader
+			// exception handling
 		}
 	}
 
 	private String resolveFileName(String line) {
 		String newFileName = line.substring(0, line.indexOf(ENDCHAR));
-		// newFileName += ENDFILENAME;
+		newFileName += ENDFILENAME;
 
 		return newFileName;
 	}

@@ -45,3 +45,8 @@
 /Insert into occrule_ou
 /Insert into occrulesch_oe
 /Insert into schedule_bu
+/Insert into d_category_filter_exp.sql
+/Insert into d_data_owner_processing.sql
+/Insert into d_pareto_freq_boundary.sql
+/Insert into d_supplier_order_reason_map.sql
+/Insert into schedule_bu.sql
