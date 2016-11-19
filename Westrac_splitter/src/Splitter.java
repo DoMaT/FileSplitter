@@ -15,21 +15,21 @@ public class Splitter {
 	private static String FILENAME;
 	private static char ENDCHAR = '(';
 	private static String ENDFILENAME = ".sql";
-	private static boolean VERBOSE = false;
+	private static boolean VERBOSE = true;
 	private Vector<String> fileNames = new Vector<String>();
 
 	Vector<File> files = new Vector<File>();
 
 	HashMap<String, Writer> fileNameWriterMap = new HashMap<String, Writer>();
-	//TODO przechowywanie writera w hashmapie
-	//TODO wybór œcie¿ki zapisu
-	//TODO Usuwanie pliku przed pierwszym zapisem
-	
+	// TODO przechowywanie writera w hashmapie
+	// TODO wybór œcie¿ki zapisu
+	// TODO Usuwanie pliku przed pierwszym zapisem
+
 	public Splitter(String _FILE) {
 		FILENAME = _FILE;
 	}
-	
-	public Splitter(String _FILE, char _ENDCHAR, String _ENDFILENAME, boolean _VERBOSE){
+
+	public Splitter(String _FILE, char _ENDCHAR, String _ENDFILENAME, boolean _VERBOSE) {
 		FILENAME = _FILE;
 		ENDCHAR = _ENDCHAR;
 		ENDFILENAME = _ENDFILENAME;
@@ -106,7 +106,7 @@ public class Splitter {
 			for (String name : fileNames) {
 				System.out.println(name);
 			}
-		}catch (FileNotFoundException e) {
+		} catch (FileNotFoundException e) {
 			System.out.println("File not found...");
 			System.exit(0);
 		}
@@ -116,12 +116,39 @@ public class Splitter {
 
 		String newFileName = resolveFileName(line);
 
-		if(VERBOSE)
-			System.out.println("Created file: " + newFileName);
+		try (BufferedReader br = new BufferedReader(new FileReader(newFileName))) {
+			// file found - delete
+			
+			File here = new File(".");
+			String absPath = here.getAbsolutePath();
+			absPath = absPath.substring(0, absPath.length()-1);
+			System.out.println(absPath);
+			
+			File file = new File(absPath + newFileName);
+			//TODO powinno byæ "C:\\Temp_Folder\\
+			if (file.exists()) {
+				if(VERBOSE){
+					System.out.println("File already exists: " + absPath + newFileName);
+				}
+				if (file.delete()) {
+					// deleted
+					if (VERBOSE) {
+						System.out.println("Deleted already existing file: " + newFileName);
+						System.out.println("Created file: " + newFileName);
+					}
+				} else {
+					// delete failed
+					if (VERBOSE)
+						System.out.println("Delete failed, writing to already existing file: " + newFileName);
+				}
 
-//		@SuppressWarnings("unused")
-//		File file = new File(newFileName);
-		
+			}
+		} catch (FileNotFoundException e) {
+			// file not found
+			if (VERBOSE)
+				System.out.println("Created file: " + newFileName);
+		}
+
 		try (FileWriter fw = new FileWriter(newFileName, true);
 				BufferedWriter bw = new BufferedWriter(fw);
 				PrintWriter out = new PrintWriter(bw)) {
@@ -138,7 +165,7 @@ public class Splitter {
 
 		String newFileName = resolveFileName(line);
 
-		if(VERBOSE)
+		if (VERBOSE)
 			System.out.println("Saved in file: " + newFileName);
 
 		try (FileWriter fw = new FileWriter(newFileName, true);
