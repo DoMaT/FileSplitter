@@ -15,7 +15,7 @@ public class Splitter {
 	private static String FILENAME;
 	private static char ENDCHAR = '(';
 	private static String ENDFILENAME = ".sql";
-	private static boolean VERBOSE = true;
+	private static boolean VERBOSE = false;
 	private Vector<String> fileNames = new Vector<String>();
 
 	Vector<File> files = new Vector<File>();
@@ -122,26 +122,16 @@ public class Splitter {
 			File here = new File(".");
 			String absPath = here.getAbsolutePath();
 			absPath = absPath.substring(0, absPath.length()-1);
-			System.out.println(absPath);
+			
+			if(VERBOSE)
+				System.out.println(absPath);
 			
 			File file = new File(absPath + newFileName);
 			//TODO powinno byæ "C:\\Temp_Folder\\
 			if (file.exists()) {
 				if(VERBOSE){
-					System.out.println("File already exists: " + absPath + newFileName);
+					System.out.println("File already exists, overwriting: " + absPath + newFileName);
 				}
-				if (file.delete()) {
-					// deleted
-					if (VERBOSE) {
-						System.out.println("Deleted already existing file: " + newFileName);
-						System.out.println("Created file: " + newFileName);
-					}
-				} else {
-					// delete failed
-					if (VERBOSE)
-						System.out.println("Delete failed, writing to already existing file: " + newFileName);
-				}
-
 			}
 		} catch (FileNotFoundException e) {
 			// file not found
@@ -149,7 +139,7 @@ public class Splitter {
 				System.out.println("Created file: " + newFileName);
 		}
 
-		try (FileWriter fw = new FileWriter(newFileName, true);
+		try (FileWriter fw = new FileWriter(newFileName, false);
 				BufferedWriter bw = new BufferedWriter(fw);
 				PrintWriter out = new PrintWriter(bw)) {
 			out.println(line);
