@@ -58,7 +58,7 @@ public class SplitFile {
 		} else {
 			// String s =
 			// "C:\\Users\\matdom\\git\\FileSplitter\\Westrac_splitter\\src\\toSplit.sql";
-			String s = "C:\\Users\\matdom\\Desktop\\test_split.sql";
+			String s = "C:\\Users\\matdom\\Desktop\\L010_jailer_GIM.sql";
 			s = s.replace("\\", "/");
 
 			System.out.println(s);

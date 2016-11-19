@@ -15,15 +15,14 @@ public class Splitter {
 	private static String FILENAME;
 	private static char ENDCHAR = '(';
 	private static String ENDFILENAME = ".sql";
-	private static boolean VERBOSE = false;
+	private static boolean VERBOSE = true;
 	private Vector<String> fileNames = new Vector<String>();
 
 	Vector<File> files = new Vector<File>();
 
-	HashMap<String, Writer> fileNameWriterMap = new HashMap<String, Writer>();
+	HashMap<String, PrintWriter> fileNameWriterMap = new HashMap<String, PrintWriter>();
 	// TODO przechowywanie writera w hashmapie
 	// TODO wybór œcie¿ki zapisu
-	// TODO Usuwanie pliku przed pierwszym zapisem
 
 	public Splitter(String _FILE) {
 		FILENAME = _FILE;
@@ -118,18 +117,17 @@ public class Splitter {
 
 		try (BufferedReader br = new BufferedReader(new FileReader(newFileName))) {
 			// file found - delete
-			
+
 			File here = new File(".");
 			String absPath = here.getAbsolutePath();
-			absPath = absPath.substring(0, absPath.length()-1);
-			
-			if(VERBOSE)
+			absPath = absPath.substring(0, absPath.length() - 1);
+
+			if (VERBOSE)
 				System.out.println(absPath);
-			
+
 			File file = new File(absPath + newFileName);
-			//TODO powinno byæ "C:\\Temp_Folder\\
 			if (file.exists()) {
-				if(VERBOSE){
+				if (VERBOSE) {
 					System.out.println("File already exists, overwriting: " + absPath + newFileName);
 				}
 			}
@@ -139,14 +137,22 @@ public class Splitter {
 				System.out.println("Created file: " + newFileName);
 		}
 
-		try (FileWriter fw = new FileWriter(newFileName, false);
-				BufferedWriter bw = new BufferedWriter(fw);
-				PrintWriter out = new PrintWriter(bw)) {
-			out.println(line);
-
-		} catch (IOException e) {
-			// exception handling
-		}
+//		try (FileWriter fw = new FileWriter(newFileName, false);
+//				BufferedWriter bw = new BufferedWriter(fw);
+//				PrintWriter out = new PrintWriter(bw)) {
+//			out.println(line);
+//			//put(key - file name,value - printer)
+//			fileNameWriterMap.put(newFileName, out);
+//
+//		} catch (IOException e) {
+//			// exception handling
+//		}
+		PrintWriter out = getWriter(newFileName, false);
+		out.println(line);
+		out.close();
+		
+		PrintWriter outAppend = getWriter(newFileName, true);
+		fileNameWriterMap.put(newFileName, outAppend);
 
 		return newFileName;
 	}
@@ -166,6 +172,41 @@ public class Splitter {
 		} catch (IOException e) {
 			// exception handling
 		}
+	}
+	
+	private PrintWriter getWriter(String outputFile, boolean append){
+
+		FileWriter fw = null;
+		try {
+			fw = new FileWriter(outputFile, append);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		BufferedWriter bw = new BufferedWriter(fw);
+		PrintWriter out = new PrintWriter(bw);
+		
+		return out;
+	}
+	
+	private void writeToFile2(String line) {
+
+		String newFileName = resolveFileName(line);
+
+		PrintWriter out = fileNameWriterMap.get(newFileName);
+		out.println(line);
+		
+		if (VERBOSE)
+			System.out.println("Saved in file: " + newFileName);
+
+//		try (FileWriter fw = new FileWriter(newFileName, true);
+//				BufferedWriter bw = new BufferedWriter(fw);
+//				PrintWriter out = new PrintWriter(bw)) {
+//			out.println(line);
+//
+//		} catch (IOException e) {
+//			// exception handling
+//		}
 	}
 
 	private String resolveFileName(String line) {
